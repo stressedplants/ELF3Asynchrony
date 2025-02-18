@@ -1,2 +1,2 @@
 # ELF3Asynchrony
-Does ELF3 directly or indirectly control developmental asunchrony
+Our project tries to address the question: Does ELF3 directly or indirectly control developmental asynchrony?

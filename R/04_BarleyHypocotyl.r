@@ -343,34 +343,13 @@ slopesPos=lapply(dailyGrowths, function(i){
   temp=temp[which(temp>0)]
 })
 
-#gamma tests:
-library(goft)
-gamma_test(unlist(slopesPosAfterW8))
-gamma_pvals=sapply(c(1:6), function(i){
-  hist(slopesPos[[i]], main=i)
-  gamma_test(slopesPos[[i]])$p.value
-})
 
-p.adjust(gamma_pvals)
 
-sapply(c(1:5), function(i){
-  sapply(c((i+1):6), function(j){
-    ks.test(slopesPos[[i]], slopesPos[[j]])$p.value
-    
-  })
-})
+
 
 #get value of "maturation rate" for each genotype
 #Let's get the value of the maturation 
 
-
-library(fitdistrplus)
-sapply(slopes, function(i){
-  gamma_fit_try <- gamma_fit(as.numeric(i))
-  print(paste(gamma_fit_try[1,], 1/gamma_fit_try[2,]))
-  fit.gamma <- fitdist(as.numeric(i), distr = "gamma", method = "mle")
-  print(summary(fit.gamma)$estimate)
-})
 
 
 pdf(file=paste("plots/04_06_biologicalAgeBarley.pdf", sep=""), height=9.2, width=4.5)
@@ -391,35 +370,8 @@ legend(80, 300, c("Ws-2 SD", "Ws-2 LD", "elf3-4 SD", "elf3-4 LD"), lwd=1, col=c(
 
 ###colour-code and 
 
-#get slopes:
-freq=24
-slopes=sapply(invGtofYt, function(i){
-  apply(i, 2, function(j){
-    j[seq(freq+1, 142, freq)]-j[seq(1, 142-freq, freq)]
-  })
-})
 
-mergedSlopes=as.numeric(unlist(slopes))
-hist(mergedSlopes/24, xlab="Rate of maturation (per day)", col=cols[2], main="")
 
 dev.off()
 
-
-
-
-
-sapply(slopes, function(i){
-  plot(c(), xlim=c(1, 5), ylim=c(min(i), max(i)))
-  apply(i, 2, function(j){
-    lines(c(1:5), j)
-  })
-})
-
-#goodness of fit gamma
-library(goft)
-gamma_test(mergedSlopes)
-gamma_test(as.numeric(slopes[[1]]))
-gamma_test(as.numeric(slopes[[2]]))
-gamma_test(as.numeric(slopes[[3]]))
-gamma_test(as.numeric(slopes[[4]]))
 

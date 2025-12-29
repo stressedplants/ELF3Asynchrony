@@ -365,5 +365,150 @@ rect(3.7+3.6, -0.2, 3.7+3.6*3, -0.1, col="lightyellow")
 
 dev.off()
 
+###################
+# as per reviewer feedback, draw sd and cv over time for simulations
+
+
+png("plots/01_03_stDev_cv_over_time_sim.png", height=9, width=9, res=300, unit="in")
+par(mfcol=c(2,2))
+#with only starting point variation:
+
+temp_var1=apply(varyEpsBExperimentAges[[1]], 1, function(j){c(sd(j), sd(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+plot(1:30, temp_var1[1,], col=cols[1], type="lines", lwd=2, ylim=c(0, 2), xlab="chronological time", ylab="standard deviation", main="starting point variation")
+
+
+temp_var2=apply(varyEpsBExperimentAges[[2]], 1, function(j){c(sd(j), sd(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+lines(1:30, temp_var2[1,], col=cols[2], lwd=2)
+
+
+temp_var3=apply(varyEpsBExperimentAges[[3]], 1, function(j){c(sd(j), sd(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+lines(1:30, temp_var3[1,], col=cols[3], lwd=2)
+
+
+plot(1:30, temp_var1[2,], col=cols[1], type="lines", lwd=2, ylim=c(0, 0.5), xlab="chronological time", ylab="coefficient of variation")
+lines(1:30, temp_var2[2,], col=cols[2], lwd=2)
+lines(1:30, temp_var3[2,], col=cols[3], lwd=2)
+
+
+
+
+#with maturation heterogeneity
+temp_var1=apply(varyEpsAExperimentAgesMode3[[1]], 1, function(j){c(sd(j), sd(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+  plot(1:30, temp_var1[1,], col=cols[1], type="lines", lwd=2, ylim=c(0, 2), xlab="chronological time", ylab="standard deviation", main="maturation rate heterogeneity")
+ 
+  
+  temp_var2=apply(varyEpsAExperimentAgesMode3[[2]], 1, function(j){c(sd(j), sd(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+  lines(1:30, temp_var2[1,], col=cols[2], lwd=2)
+
+  
+  temp_var3=apply(varyEpsAExperimentAgesMode3[[3]], 1, function(j){c(sd(j), sd(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+  lines(1:30, temp_var3[1,], col=cols[3], lwd=2)
+ 
+  
+  plot(1:30, temp_var1[2,], col=cols[1], type="lines", lwd=2, ylim=c(0, 0.5), xlab="chronological time", ylab="coefficient of variation")
+  lines(1:30, temp_var2[2,], col=cols[2], lwd=2)
+  lines(1:30, temp_var3[2,], col=cols[3], lwd=2)
+  
+
+
+dev.off()
+
 #############################
+# as per reviewer feedback, use simulation to verify that 
+# procedure used to align curves is legitimate
+
+
+png(filename="plots/01_02_testAlignmentStrategy.png", width=8, height=8, res=300, units="in")
+par(mfrow=c(2,2))
+#simBoth=simulateInternalClocks(epsA=0, epsB=1, n=1000, ks=c(0.5, 1, 1.5), tp=c(0:30))
+simBoth=simulateInternalClocks(epsA=0.1, epsB=1, n=1000, tp=c(0,30), ks=c(0.5, 1, 1.5), mode=3)
+simMoreSpread=simulateInternalClocks(epsA=0.1, epsB=4, n=1000, tp=c(0,30), ks=c(0.5, 1, 1.5), mode=3)
+
+#plot them
+
+
+plot(c(), c(), xlim=c(0,28), ylim=c(0,29), xlab="Chronological time (days)", ylab="Biological age (days)")
+tp=rep(0:30)
+cols=c(rgb(1, 0.5,0.5,1),rgb(1, 0.7,0.2,1), rgb(0.8, 0.6,1,1))
+cols_transparent=c(rgb(1, 0.5,0.5,0.2),rgb(1, 0.7,0.2,0.2), rgb(0.8, 0.6,1,0.2))
+apply(simBoth[[1]][,1:50], 2, function(j){lines(0:29, j, col=cols_transparent[1])})
+apply(simBoth[[2]][,1:50], 2, function(j){lines(0:29, j, col=cols_transparent[2])})
+apply(simBoth[[3]][,1:50], 2, function(j){lines(0:29, j, col=cols_transparent[3])})
+
+
+plot(c(), c(), xlim=c(0,28), ylim=c(0,29), xlab="Chronological time (days)", ylab="Biological age (days)")
+tp=rep(0:30)
+cols=c(rgb(1, 0.5,0.5,1),rgb(1, 0.7,0.2,1), rgb(0.8, 0.6,1,1))
+cols_transparent=c(rgb(1, 0.5,0.5,0.2),rgb(1, 0.7,0.2,0.2), rgb(0.8, 0.6,1,0.2))
+apply(simMoreSpread[[1]][,1:50], 2, function(j){lines(0:29, j, col=cols_transparent[1])})
+apply(simMoreSpread[[2]][,1:50], 2, function(j){lines(0:29, j, col=cols_transparent[2])})
+apply(simMoreSpread[[3]][,1:50], 2, function(j){lines(0:29, j, col=cols_transparent[3])})
+#############
+#align simBoth in the same way as we do later with the barley data
+
+# fit each curve to a line of best fit and then subtract by the intercept
+x_intercepts=lapply(1:3, function(i){
+  apply(simBoth[[i]], 2, function(j){
+    intercept=lm(c(0:29)~j)$coefficients[1]
+  })
+})
+
+#plot the simBoth again, but this time aligned
+plot(c(), c(), xlim=c(0,28), ylim=c(0,29), xlab="Chronological time (days)", ylab="Biological age (days)")
+tp=rep(0:30)
+cols=c(rgb(1, 0.5,0.5,1),rgb(1, 0.7,0.2,1), rgb(0.8, 0.6,1,1))
+cols_transparent=c(rgb(1, 0.5,0.5,0.2),rgb(1, 0.7,0.2,0.2), rgb(0.8, 0.6,1,0.2))
+
+sapply(1:50, function(id){
+  j=simBoth[[1]][,id]
+  x=x_intercepts[[1]][id]
+  lines(0:29-x, j, col=cols_transparent[1])
+})
+
+sapply(1:50, function(id){
+  j=simBoth[[2]][,id]
+  x=x_intercepts[[2]][id]
+  lines(0:29-x, j, col=cols_transparent[2])
+})
+
+sapply(1:50, function(id){
+  j=simBoth[[3]][,id]
+  x=x_intercepts[[3]][id]
+  lines(0:29-x, j, col=cols_transparent[3])
+})
+
+####Try it again with MoreSpread
+# fit each curve to a line of best fit and then subtract by the intercept
+x_intercepts=lapply(1:3, function(i){
+  apply(simMoreSpread[[i]], 2, function(j){
+    intercept=lm(c(0:29)~j)$coefficients[1]
+  })
+})
+
+#plot the simMoreSpread again, but this time aligned
+plot(c(), c(), xlim=c(0,28), ylim=c(0,29), xlab="Chronological time (days)", ylab="Biological age (days)")
+tp=rep(0:30)
+cols=c(rgb(1, 0.5,0.5,1),rgb(1, 0.7,0.2,1), rgb(0.8, 0.6,1,1))
+cols_transparent=c(rgb(1, 0.5,0.5,0.2),rgb(1, 0.7,0.2,0.2), rgb(0.8, 0.6,1,0.2))
+
+sapply(1:50, function(id){
+  j=simMoreSpread[[1]][,id]
+  x=x_intercepts[[1]][id]
+  lines(0:29-x, j, col=cols_transparent[1])
+})
+
+sapply(1:50, function(id){
+  j=simMoreSpread[[2]][,id]
+  x=x_intercepts[[2]][id]
+  lines(0:29-x, j, col=cols_transparent[2])
+})
+
+sapply(1:50, function(id){
+  j=simMoreSpread[[3]][,id]
+  x=x_intercepts[[3]][id]
+  lines(0:29-x, j, col=cols_transparent[3])
+})
+
+
+dev.off()
 

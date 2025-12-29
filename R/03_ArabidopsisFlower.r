@@ -57,7 +57,8 @@ mutantBolt[,"Genotype"]=factor(mutantBolt[,"Genotype"], levels = c("Ws-2", "elf3
 mutantBolt[,"Condition"]=factor(mutantBolt[,"Condition"], levels = c("SD", "LD"))
 
 ggplot(mutantBolt, aes(x=Genotype, y=DaysToFlower, fill=Condition)) +
-  geom_boxplot()+ scale_fill_manual(values=c("SD"="snow4", "LD"="snow2")) +theme_minimal()+ scale_x_discrete(labels=expression("Ws-2" = "Ws-2", "elf3-4" = italic("elf3-4"))) + ylab("Days until bolting") 
+  geom_boxplot()+ scale_fill_manual(values=c("SD"="snow4", "LD"="snow2")) +theme_minimal()+ scale_x_discrete(labels=expression("Ws-2" = "Ws-2", "elf3-4" = italic("elf3-4"))) + ylab("Days until bolting") +
+  geom_point(position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75), size = 1)
 ggsave("plots/03_04_daysUntilBolting.png", width=3.5, height=3.5 , dpi=500, unit='in')
 
 mutantBolt$merge=paste(mutantBolt$Genotype, mutantBolt$Condition)
@@ -99,7 +100,8 @@ ggsave("plots/03_06_bubbleplotLeafMutant.png", width=5, height=3.5, dpi=500, uni
 
 #D) relationship between leaf count and bolting time in mutants
 ggplot(mutantBolt, aes(x=Genotype, y=LeafNumber, fill=Condition)) +
-  geom_boxplot()+ scale_fill_manual(values=c("SD"="snow4", "LD"="snow2"))+ theme_minimal()+ scale_x_discrete(labels=expression("Ws-2" = "Ws-2", "elf3-4" = italic("elf3-4"))) + ylab("Leaf count at bolting") 
+  geom_boxplot()+ scale_fill_manual(values=c("SD"="snow4", "LD"="snow2"))+ theme_minimal()+ scale_x_discrete(labels=expression("Ws-2" = "Ws-2", "elf3-4" = italic("elf3-4"))) + ylab("Leaf count at bolting") +
+  geom_point(position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75), size = 1)
 
 ggsave("plots/03_07_leafCount.png", width=3.5, height=3.5, dpi=500, unit='in')
 

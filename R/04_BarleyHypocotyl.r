@@ -152,7 +152,7 @@ sapply(invGtofYt, function(i){
 
 ####include
 names(invGtofYt)=unique(barleyGrowth$Genotype)
-plot(c(), xlim=c(0, 17), ylim=c(min(unlist(invGtofYt)), max(unlist(invGtofYt))), xlab="Chronological time (day)", ylab="Biomass scaled by mean growth curve")
+plot(c(), xlim=c(0, 17), ylim=c(min(unlist(invGtofYt)), max(unlist(invGtofYt))), xlab="Chronological time (day)", ylab="Inferred biological age (days)")
 sapply(c("Bowman", "B289", "B290"), function(id){
   i=invGtofYt[[id]]
   apply(i, 2, function(j){
@@ -206,7 +206,7 @@ sapply(names(colsForGenos), function(g){
   
   
 })
-legend(0, 2.5, c("Bowman", "eam8.k (HvELF3)", "eam8.w (HvELF3)"), col=colsForGenos, lwd=2, bty='n')
+legend(0, 2.5, c("Bowman", "eam8.k (Hvelf3)", "eam8.w (Hvelf3)"), col=colsForGenos, lwd=2, bty='n')
 
 #aligned
 plot(c(), xlim=c(0, 20), ylim=c(0, maxMass), xlab="Day", ylab="Weight (g)")
@@ -229,7 +229,7 @@ sapply(names(colsForGenos), function(g){
 })
 ###Unaligned biological age
 names(invGtofYt)=unique(barleyGrowth$Genotype)
-plot(c(), xlim=c(0, 17), ylim=c(min(unlist(invGtofYt)), max(unlist(invGtofYt))), xlab="Chronological time (day)", ylab="Biomass scaled by mean growth curve")
+plot(c(), xlim=c(0, 17), ylim=c(min(unlist(invGtofYt)), max(unlist(invGtofYt))), xlab="Chronological time (day)", ylab="Inferred biological age (days)")
 sapply(c("Bowman", "B289", "B290"), function(id){
   i=invGtofYt[[id]]
   apply(i, 2, function(j){
@@ -237,7 +237,7 @@ sapply(c("Bowman", "B289", "B290"), function(id){
   })
 })
 #aligned biological age
-plot(c(), xlim=c(0, 17), ylim=c(min(unlist(invGtofYt)), max(unlist(invGtofYt))), xlab="Chronological time (day)", ylab="Biomass scaled by mean growth curve")
+plot(c(), xlim=c(0, 17), ylim=c(min(unlist(invGtofYt)), max(unlist(invGtofYt))), xlab="Chronological time (day)", ylab="Inferred biological age (days)")
 sapply(c("Bowman", "B289", "B290"), function(id){
   i=invGtofYt[[id]]
   #find smooth function of yt
@@ -249,8 +249,44 @@ sapply(c("Bowman", "B289", "B290"), function(id){
 
 dev.off()
 
+####As per reviewer comment, make plots of st dev and cv over time
 
-pdf(file="plots/04_05_barleyGrowthCurvesBioAge.pdf", width=3.8, height=7)
+#calculate stdev
+stdev_barley=sapply(c("Bowman", "B289", "B290"), function(g){
+  sapply(c(3:11), function(tp){
+    sd(barleyGrowth[which(barleyGrowth$Genotype==g),tp])
+  })
+})
+
+cv_barley=sapply(c("Bowman", "B289", "B290"), function(g){
+  sapply(c(3:11), function(tp){
+    sd(barleyGrowth[which(barleyGrowth$Genotype==g),tp])/mean(barleyGrowth[which(barleyGrowth$Genotype==g),tp])
+  })
+})
+
+png(filename = "plots/04_08_stDev_cv_overTime_barley.png", height=800, pointsize=20)
+par(mfrow=c(2,1))
+
+plot(c(), xlim=c(0, 20), ylim=c(0, 0.3), xlab="Day", ylab="St. Dev.")
+colsForGenos=cols
+names(colsForGenos)=c("Bowman", "B289", "B290")
+sapply(names(colsForGenos), function(i){
+  lines(times[1:9], stdev_barley[,i], col=colsForGenos[i], lwd=2)
+})
+
+plot(c(), xlim=c(0, 20), ylim=c(0, 0.3), xlab="Day", ylab="Coef. of Var.")
+colsForGenos=cols
+names(colsForGenos)=c("Bowman", "B289", "B290")
+sapply(names(colsForGenos), function(i){
+  lines(times[1:9], cv_barley[,i], col=colsForGenos[i], lwd=2)
+})
+
+dev.off()
+
+
+
+
+pdf(file="plots/04_05_barleyGrowthCurvesBioAge.pdf", width=3.8, height=9)
 par(mfrow = c(3, 1))
 par(mar = c(5, 5, 1.3, 1))
 ####Draw histograms at day 10, aligned and not aligned
@@ -259,9 +295,13 @@ names(yt)=names(invGtofYt)
 temp=lapply(c("Bowman", "B289", "B290"), function(id){
   i=yt[[id]][,"W10"]
 })
-names(temp)=c("Bowman", "eam8.k (Hvelf3)", "eam8.w (Hvelf3)")
+names(temp)=c("Bowman", "eam8.k(Hvelf3)", "eam8.w(Hvelf3)")
 boxplot(temp, col=colsForGenos, xlab="Genotypes", ylab="Weight (g)", main="Day 10 (unaligned)")
+points(jitter(rep(1, length(temp[["Bowman"]])),amount=0.1), temp[["Bowman"]], pch=20)
+points(jitter(rep(2, length(temp[["eam8.k(Hvelf3)"]])),amount=0.1), temp[["eam8.k(Hvelf3)"]], pch=20)
+points(jitter(rep(3, length(temp[["eam8.w(Hvelf3)"]])),amount=0.1), temp[["eam8.w(Hvelf3)"]], pch=20)
 
+#missing
 dfTemp=data.frame(size=c(temp[[1]], 
                          temp[[2]],
                          temp[[3]]),
@@ -293,8 +333,14 @@ tempAligned=lapply(c("Bowman", "B289", "B290"), function(id){
   })
   
 })
-names(tempAligned)=c("Bowman", "eam8.k (Hvelf3)", "eam8.w (Hvelf3)")
-boxplot(tempAligned, col=colsForGenos, xlab="Genotypes", ylab="Weight (g)", main="Day 10 (aligned)")
+names(tempAligned)=c("Bowman", "eam8.k(Hvelf3)", "eam8.w(Hvelf3)")
+boxplot(tempAligned, col=colsForGenos, xlab="Genotypes", ylab="Weight (g)", main="Day 10 (aligned)", outline=T)
+points(jitter(rep(1, length(tempAligned[["Bowman"]])),amount=0.1), tempAligned[["Bowman"]], pch=20)
+points(jitter(rep(2, length(tempAligned[["eam8.k(Hvelf3)"]])),amount=0.1), tempAligned[["eam8.k(Hvelf3)"]], pch=20)
+points(jitter(rep(3, length(tempAligned[["eam8.w(Hvelf3)"]])),amount=0.1), tempAligned[["eam8.w(Hvelf3)"]], pch=20)
+
+
+
 
 dfTemp=data.frame(size=c(tempAligned[[1]], 
                          tempAligned[[2]],
@@ -320,7 +366,7 @@ dev.off()
 ###What do biological times look like for plants that are within one day of each other in terms of germination time?
 names(xints)=names(yt)
 #aligned biological age
-plot(c(), xlim=c(0, 17), ylim=c(min(unlist(invGtofYt)), max(unlist(invGtofYt))), xlab="Chronological time (day)", ylab="Biomass scaled by mean growth curve")
+plot(c(), xlim=c(0, 17), ylim=c(min(unlist(invGtofYt)), max(unlist(invGtofYt))), xlab="Chronological time (day)", ylab="Inferred biological age (days)")
 sapply(c("Bowman", "B289", "B290"), function(id){
   i=invGtofYt[[id]][,which(xints[[id]]>(-0.5) & xints[[id]]<(0.5))]
   #find smooth function of yt
@@ -332,19 +378,48 @@ sapply(c("Bowman", "B289", "B290"), function(id){
 
 
 ###Are daily growth rates following a gamma distribution?
-dailyGrowths=sapply(invGtofYt, function(i){
+#only do this on the samples we care about: c("Bowman", "B289", "B290")
+slopes_elf3Con=list(invGtofYt[[1]], invGtofYt[[4]], invGtofYt[[3]])
+dailyGrowths=sapply(slopes_elf3Con, function(i){
   apply(i, 2, function(j){
     (j[2:8]-j[1:7])/(times[2:8]-times[1:7])
   })
 })
 
+#contains only positives
 slopesPos=lapply(dailyGrowths, function(i){
   temp=as.numeric(i)
   temp=temp[which(temp>0)]
 })
 
 
+library(fitdistrplus)
+png("plots/04_07_barleyGammaDist.png", pointsize=20, height=9, width=9, unit="in", res=300)
+par(mfcol=c(2,2))
+fit <- fitdist(unlist(slopesPos)/24, distr = "gamma", method = "mle")
+denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="")
+legend(1.5, 1.2, "gamma", col="red", lty=1, bty="n")
 
+fit <- fitdist(unlist(slopesPos[[1]])/24, distr = "gamma", method = "mle")
+denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="")
+legend(1.5, 1.2, "gamma", col="red", lty=1, bty="n")
+
+fit <- fitdist(unlist(slopesPos[[2]])/24, distr = "gamma", method = "mle")
+denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="")
+legend(1.5, 1.2, "gamma", col="red", lty=1, bty="n")
+
+fit <- fitdist(unlist(slopesPos[[3]])/24, distr = "gamma", method = "mle")
+denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="")
+legend(1.5, 1.2, "gamma", col="red", lty=1, bty="n")
+
+dev.off()
+library(goft)
+gamma_test(unlist(slopesPos)/24)
+
+###separate tests for each population
+gamma_test(slopesPos[[1]]/24)
+gamma_test(slopesPos[[2]]/24) #
+gamma_test(slopesPos[[3]]/24)
 
 
 #get value of "maturation rate" for each genotype
@@ -356,7 +431,7 @@ pdf(file=paste("plots/04_06_biologicalAgeBarley.pdf", sep=""), height=9.2, width
 par(mfcol = c(2,1), oma = c(0.1, 0.1, 0.1, 0.1))
 
 cols_by_cond=c("lightgreen", "forestgreen", "lightblue", "cornflowerblue")
-plot(c(), xlim=c(74,(74+143)), ylim=c(74, 300), xlab="Chronological time (h)", ylab="Biomass scaled by mean growth curve")
+plot(c(), xlim=c(74,(74+143)), ylim=c(74, 300), xlab="Chronological time (h)", ylab="Inferred biological age (days)")
 sapply(c(1:4), function(id){
   i=invGtofYt[[id]]
   apply(i, 2, function(j){
@@ -368,7 +443,7 @@ legend(80, 300, c("Ws-2 SD", "Ws-2 LD", "elf3-4 SD", "elf3-4 LD"), lwd=1, col=c(
 
 
 
-###colour-code and 
+
 
 
 

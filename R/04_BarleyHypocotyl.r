@@ -310,6 +310,11 @@ dfTemp=data.frame(size=c(temp[[1]],
                              rep("eam8.w", length(temp[[3]]))))
 TukeyHSD(aov(size~genotype,data=dfTemp))
 
+shapiro.test(residuals(lm(size~genotype,data=dfTemp)))
+bartlett.test(residuals(lm(size~genotype,data=dfTemp)) ~ dfTemp$genotype)
+
+
+
 pvals=c(var.test(temp[[1]], temp[[2]])$p.value,
         var.test(temp[[1]], temp[[3]])$p.value)
 p.adjust(pvals)
@@ -349,6 +354,10 @@ dfTemp=data.frame(size=c(tempAligned[[1]],
                              rep("eam8.k", length(tempAligned[[2]])),
                              rep("eam8.w", length(tempAligned[[3]]))))
 TukeyHSD(aov(size~genotype,data=dfTemp))
+
+shapiro.test(residuals(lm(size~genotype,data=dfTemp)))
+bartlett.test(residuals(lm(size~genotype,data=dfTemp)) ~ dfTemp$genotype)
+
 
 pvals=c(var.test(tempAligned[[1]], tempAligned[[2]])$p.value,
         var.test(tempAligned[[1]], tempAligned[[3]])$p.value)
@@ -397,19 +406,19 @@ library(fitdistrplus)
 png("plots/04_07_barleyGammaDist.png", pointsize=20, height=9, width=9, unit="in", res=300)
 par(mfcol=c(2,2))
 fit <- fitdist(unlist(slopesPos)/24, distr = "gamma", method = "mle")
-denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="")
+denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="", xlim=c(0, 0.15), ylim=c(0, 60), breaks=seq(0, 0.15, 0.01))
 legend(1.5, 1.2, "gamma", col="red", lty=1, bty="n")
 
 fit <- fitdist(unlist(slopesPos[[1]])/24, distr = "gamma", method = "mle")
-denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="")
+denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="", xlim=c(0, 0.15), ylim=c(0, 60), breaks=seq(0, 0.15, 0.01))
 legend(1.5, 1.2, "gamma", col="red", lty=1, bty="n")
 
 fit <- fitdist(unlist(slopesPos[[2]])/24, distr = "gamma", method = "mle")
-denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="")
+denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="", xlim=c(0, 0.15), ylim=c(0, 60), breaks=seq(0, 0.15, 0.01))
 legend(1.5, 1.2, "gamma", col="red", lty=1, bty="n")
 
 fit <- fitdist(unlist(slopesPos[[3]])/24, distr = "gamma", method = "mle")
-denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="")
+denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age", main="", xlim=c(0, 0.15), ylim=c(0, 60), breaks=seq(0, 0.15, 0.01))
 legend(1.5, 1.2, "gamma", col="red", lty=1, bty="n")
 
 dev.off()

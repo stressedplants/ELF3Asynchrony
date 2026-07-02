@@ -413,6 +413,55 @@ temp_var1=apply(varyEpsAExperimentAgesMode3[[1]], 1, function(j){c(sd(j), sd(j)/
 
 dev.off()
 
+############################
+# As per reviewer feedback, repeat this with Fano Factor
+png("plots/01_03_var_FF_over_time_sim.png", height=9, width=9, res=300, unit="in")
+par(mfcol=c(2,2))
+#with only starting point variation:
+
+temp_var1=apply(varyEpsBExperimentAges[[1]], 1, function(j){c(var(j), var(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+plot(1:30, temp_var1[1,], col=cols[1], type="lines", lwd=2, ylim=c(0, 2.3), xlab="chronological time", ylab="variance", main="starting point variation")
+
+
+temp_var2=apply(varyEpsBExperimentAges[[2]], 1, function(j){c(var(j), var(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+lines(1:30, temp_var2[1,], col=cols[2], lwd=2)
+
+
+temp_var3=apply(varyEpsBExperimentAges[[3]], 1, function(j){c(var(j), var(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+lines(1:30, temp_var3[1,], col=cols[3], lwd=2)
+
+
+plot(1:30, temp_var1[2,], col=cols[1], type="lines", lwd=2, ylim=c(0, 0.5), xlab="chronological time", ylab="Fano Factor")
+lines(1:30, temp_var2[2,], col=cols[2], lwd=2)
+lines(1:30, temp_var3[2,], col=cols[3], lwd=2)
+
+
+
+
+#with maturation heterogeneity
+temp_var1=apply(varyEpsAExperimentAgesMode3[[1]], 1, function(j){c(var(j), var(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+plot(1:30, temp_var1[1,], col=cols[1], type="lines", lwd=2, ylim=c(0, 2), xlab="chronological time", ylab="variance", main="maturation rate heterogeneity")
+
+
+temp_var2=apply(varyEpsAExperimentAgesMode3[[2]], 1, function(j){c(var(j), var(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+lines(1:30, temp_var2[1,], col=cols[2], lwd=2)
+
+
+temp_var3=apply(varyEpsAExperimentAgesMode3[[3]], 1, function(j){c(var(j), var(j)/mean(j))})  #lines(1:50, j, col=cols_transparent[1])})
+lines(1:30, temp_var3[1,], col=cols[3], lwd=2)
+
+
+plot(1:30, temp_var1[2,], col=cols[1], type="lines", lwd=2, ylim=c(0, 0.5), xlab="chronological time", ylab="Fano Factor")
+lines(1:30, temp_var2[2,], col=cols[2], lwd=2)
+lines(1:30, temp_var3[2,], col=cols[3], lwd=2)
+
+
+
+dev.off()
+
+
+
+
 #############################
 # as per reviewer feedback, use simulation to verify that 
 # procedure used to align curves is legitimate

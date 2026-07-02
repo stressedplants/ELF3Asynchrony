@@ -95,6 +95,28 @@ scatter=ggplot(data=stressData[which(!is.na(stressData$Green.yellow)),], aes(x=a
   geom_smooth(method = "lm", aes(lty=Genotype), colour='grey', 
               se = F) + scale_colour_manual(drop=F, labels=c("green", "yellow-green", "yellow"), values=c("darkgreen", 'limegreen', 'goldenrod'))+labs(colour='Leaf colour')
 
+
+#Let's do some stats to see if genotype is significant independent of size
+
+#check interaction:
+stressData_includeLiving=stressData[which(!is.na(stressData$Green.yellow)),]
+stressData_includeLiving$weightChange=as.numeric(stressData_includeLiving$weightChange)
+stressData_includeLiving$WeightPreStress=as.numeric(stressData_includeLiving$WeightPreStress)
+stressData_includeLiving$Genotype=as.factor(stressData_includeLiving$Genotype)
+interact=lm(weightChange ~ WeightPreStress + Genotype + WeightPreStress:Genotype, data=stressData_includeLiving)
+summary(interact)
+anova(interact)
+
+shapiro.test(residuals(interact))
+bartlett.test(residuals(interact) ~ stressData_includeLiving$Genotype)
+
+#does not meet normality requirements
+library(sm)
+ancova=sm.ancova(x = stressData_includeLiving$WeightPreStress, 
+          y = stressData_includeLiving$weightChange, 
+          group = stressData_includeLiving$Genotype, 
+          model = "parallel")
+
 boxBf=ggplot(data=stressData[which(!is.na(stressData$Green.yellow)),], aes(x=Genotype, y=as.numeric(weightChange)))+geom_boxplot(colour="black")+theme_classic(base_size=15)+xlab("Initial fresh weight (g)")+ylab("Change in fresh weight (g)")+theme_classic(base_size=15)+xlab("Genotype")+ylab("Change in fresh weight (g)") +theme(axis.text.x = element_text(angle = 15, vjust = 1, hjust=1))+ geom_jitter(shape=16, color='orange', position=position_jitter(0.2))
 #a=ggplot(data=stressData[which(!is.na(stressData$Green.yellow)),], aes(x=Genotype, y=as.numeric(WeightPreStress), col="grey"))+geom_boxplot()+theme_classic(base_size=15)+xlab("Pre-Stress fresh weight (g)")+ylab("Change in fresh weight (g)")+theme_classic(base_size=15)+xlab("Genotype")+ylab("Pre-stress fresh weight (g)") +theme(axis.text.x = element_text(angle = 15, vjust = 1, hjust=1))+geom_point(position = position_jitterdodge())
 stressData$minusPredicted=stressData$weightChange-predict(lm(weightChange ~ Initalweight, data=stressData))

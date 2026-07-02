@@ -64,6 +64,8 @@ ggsave("plots/03_04_daysUntilBolting.png", width=3.5, height=3.5 , dpi=500, unit
 mutantBolt$merge=paste(mutantBolt$Genotype, mutantBolt$Condition)
 TukeyHSD(aov(DaysToFlower ~ merge, mutantBolt))
 
+shapiro.test(residuals(lm(DaysToFlower ~ merge, mutantBolt)))
+bartlett.test(residuals(lm(DaysToFlower ~ merge, mutantBolt)) ~ mutantBolt$Genotype)
 
 
 #C) standard deviation by genotypes bar plot, ordered by mean
@@ -106,6 +108,12 @@ ggplot(mutantBolt, aes(x=Genotype, y=LeafNumber, fill=Condition)) +
 ggsave("plots/03_07_leafCount.png", width=3.5, height=3.5, dpi=500, unit='in')
 
 TukeyHSD(aov(LeafNumber ~ merge, data=mutantBolt))
+
+shapiro.test(residuals(lm(LeafNumber ~ merge, mutantBolt)))
+bartlett.test(residuals(lm(LeafNumber ~ merge, mutantBolt)) ~ mutantBolt$Genotype)
+install.packages("dunn.test")
+library(dunn.test)
+dunn.test(as.numeric(mutantBolt$LeafNumber), factor(mutantBolt$merge), method = "holm")
 
 #E) relationship between standard deviation of leaf count and bolting time
 

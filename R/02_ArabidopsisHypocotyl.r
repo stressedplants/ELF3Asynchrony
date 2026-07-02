@@ -327,7 +327,7 @@ a=sapply(slopes, function(sl){
 mergedSlopes=as.numeric(sl)
 print(mergedSlopes)
 fit <- fitdist(mergedSlopes/24, distr = "gamma", method = "mle")
-denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age (per day)", main="")
+denscomp(fit, addlegend=FALSE, xlab="Inferred biological/chronological age (per day)", main="",  ylim=c(0, 2.25), xlim=c(0, 2.5), breaks=seq(0, 2.5, 0.25))
 fit$loglik
 })
 
